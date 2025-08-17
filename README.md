@@ -1,7 +1,7 @@
 # ViPER4Android-A15-Stabiliser
-Magisk Module to stabilise ViPER4FX on Android 15+ 
 
 What it Does:-
+
 It’s a compatibility layer for ViPER4Android on Android 15.
 Since Android 15 tightened audio effect handling, this Magisk module ensures the V4A engine (libv4a_fx.so) loads reliably by:
 

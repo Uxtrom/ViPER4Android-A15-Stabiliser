@@ -16,7 +16,8 @@ Setting the app’s defaults to Legacy / Session-0 mode, which is the most stabl
 Optionally disabling conflicting stock effects like MusicFX or LineageOS AudioFX.
 
 How to use:-
-1. Install https://github.com/programminghoch10/ViPER4AndroidRepackaged/releases
+1. Install https://github.com/programminghoch10/ViPER4AndroidRepackaged/releases OR https://github.com/WSTxda/ViperFX-RE-Releases
+  
 2. Flash ViPER4Android Stabiliser then reboot.
 
 Recommendations:-

@@ -4,20 +4,17 @@ PROPFILE=true
 POSTFSDATA=true
 LATESTARTSERVICE=true
 
-print_title() { ui_print "*******************************"; ui_print "$1"; ui_print "*******************************"; }
-print_title "ViPER4Android A15 Compatibility Pack (ARM/ARM64 + Watchdog)"
+ui_print(){ echo "$@"; }
+
+ui_print "***** ViPER4Android A15 Compat (Auto-Find + Watchdog) *****"
 
 SDK="$(getprop ro.build.version.sdk)"
 ABI_PRIMARY="$(getprop ro.product.cpu.abi)"
 ABILIST32="$(getprop ro.product.cpu.abilist32)"
-ABILIST64="$(getprop ro.product.cpu.abilist64)"
+ui_print "- SDK: $SDK  ABI: $ABI_PRIMARY  abilist32: $ABILIST32"
+
 SYSROOT="/system"
 SYS_EXT="/system_ext"
-
-ui_print "- Android SDK: $SDK"
-ui_print "- ABI primary: $ABI_PRIMARY"
-ui_print "- abilist32: $ABILIST32"
-ui_print "- abilist64: $ABILIST64"
 
 pick_sfx_dir() {
   if [ "$1" = "64" ]; then
@@ -27,63 +24,81 @@ pick_sfx_dir() {
   fi
 }
 
-install_engine_64() {
-  local DST; DST="$(pick_sfx_dir 64)"
-  local SRC="$ZIPDIR/engine/arm64-v8a/libv4a_fx.so"
+copy_engine() {
+  # $1 bitness 32/64, $2 source path, $3 filename
+  local BIT="$1"; local SRC="$2"; local NAME="$3"
   [ ! -s "$SRC" ] && return 1
-  ui_print "- Installing arm64 engine -> $DST"
-  mkdir -p "$MODPATH$DST"
-  cp -fp "$SRC" "$MODPATH$DST/libv4a_fx.so"
-  set_perm "$MODPATH$DST/libv4a_fx.so" 0644 root root
-  return 0
-}
-install_engine_32() {
-  local DST; DST="$(pick_sfx_dir 32)"
-  local SRC="$ZIPDIR/engine/armeabi-v7a/libv4a_fx.so"
-  [ ! -s "$SRC" ] && return 1
-  ui_print "- Installing 32-bit (ARM) engine -> $DST"
-  mkdir -p "$MODPATH$DST"
-  cp -fp "$SRC" "$MODPATH$DST/libv4a_fx.so"
-  set_perm "$MODPATH$DST/libv4a_fx.so" 0644 root root
+  local DSTDIR="$MODPATH$(pick_sfx_dir $BIT)"
+  mkdir -p "$DSTDIR"
+  cp -fp "$SRC" "$DSTDIR/$NAME" && chmod 0644 "$DSTDIR/$NAME"
+  ui_print "- Copied $NAME ($BIT-bit) -> $DSTDIR/$NAME"
   return 0
 }
 
-INSTALLED_ANY=0
-case "$ABI_PRIMARY" in
-  arm64-v8a)
-    install_engine_64 && INSTALLED_ANY=1
-    if [ -n "$ABILIST32" ]; then install_engine_32 && INSTALLED_ANY=1; fi
-    ;;
-  armeabi-v7a|armeabi)
-    install_engine_32 && INSTALLED_ANY=1
-    ;;
-  *)
-    install_engine_64 && INSTALLED_ANY=1
-    install_engine_32 && INSTALLED_ANY=1
-    ;;
-esac
+try_from_zip() {
+  local COP=0
+  for NAME in libv4afx_r.so libv4a_fx.so; do
+    [ -s "$ZIPDIR/engine/arm64-v8a/$NAME" ] && copy_engine 64 "$ZIPDIR/engine/arm64-v8a/$NAME" "$NAME" && COP=1
+    [ -s "$ZIPDIR/engine/armeabi-v7a/$NAME" ] && copy_engine 32 "$ZIPDIR/engine/armeabi-v7a/$NAME" "$NAME" && COP=1
+  done
+  return $COP
+}
 
-if [ "$INSTALLED_ANY" -eq 0 ]; then
-  abort "! Missing engine binaries. Place your ViPER .so at engine/armeabi-v7a/libv4a_fx.so (and optionally engine/arm64-v8a/libv4a_fx.so) before flashing."
+# Search common locations in system and other Magisk/KSU modules
+find_existing_engine() {
+  local BIT="$1"
+  local NAME
+  local dirs=""
+  if [ "$BIT" = "64" ]; then
+    dirs="$SYS_EXT/lib64/soundfx $SYSROOT/lib64/soundfx /vendor/lib64/soundfx"
+  else
+    dirs="$SYS_EXT/lib/soundfx $SYSROOT/lib/soundfx /vendor/lib/soundfx"
+  fi
+  # Magisk/KernelSU mirrors and modules
+  dirs="$dirs /sbin/.magisk/mirror$SYS_EXT/lib$([ "$BIT" = "64" ] && echo 64)/soundfx \
+             /sbin/.magisk/mirror$SYSROOT/lib$([ "$BIT" = "64" ] && echo 64)/soundfx \
+             /sbin/.magisk/mirror/vendor/lib$([ "$BIT" = "64" ] && echo 64)/soundfx"
+  # Scan installed modules for libs under lib*/soundfx
+  for d in /data/adb/modules/* /data/adb/modules_update/*; do
+    [ -d "$d" ] || continue
+    for sub in lib$([ "$BIT" = "64" ] && echo 64)/soundfx; do
+      dirs="$dirs $d/system/$sub $d/system_ext/$sub $d/$sub"
+    done
+  done
+  for NAME in libv4afx_r.so libv4a_fx.so; do
+    for d in $dirs; do
+      if [ -s "$d/$NAME" ]; then
+        ui_print "- Found $NAME ($BIT-bit) at $d/$NAME"
+        copy_engine "$BIT" "$d/$NAME" "$NAME" && return 0
+      fi
+    done
+  done
+  return 1
+}
+
+COPIED=0
+if try_from_zip; then COPIED=1; fi
+# If not inside zip, hunt in system/modules
+if [ "$COPIED" -eq 0 ]; then
+  ui_print "- No engine in zip; scanning system and installed modules..."
+  find_existing_engine 64 && COPIED=1
+  # Install 32-bit too if device supports it
+  if [ -n "$ABILIST32" ]; then
+    find_existing_engine 32 && COPIED=1
+  fi
 fi
 
-AML_FLAG=0
-if [ -d "/data/adb/modules/aml" ] && [ "$(grep -s '^enable=' /data/adb/modules/aml/module.prop | cut -d= -f2)" != "0" ]; then
-  AML_FLAG=1
-fi
-[ "$AML_FLAG" -eq 1 ] && ui_print "- AML detected: skipping direct audio_effects edits (AML will merge)."
-
-if [ "$AML_FLAG" -eq 0 ]; then
-  mkdir -p "$MODPATH/system/etc"
-  cp -fp "$ZIPDIR/config/v4a_effects_snippet.xml" "$MODPATH/system/etc/v4a_effects_snippet.xml"
-  cp -fp "$ZIPDIR/config/v4a_effects_snippet.conf" "$MODPATH/system/etc/v4a_effects_snippet.conf"
-  set_perm "$MODPATH/system/etc/v4a_effects_snippet.xml" 0644 root root
-  set_perm "$MODPATH/system/etc/v4a_effects_snippet.conf" 0644 root root
-  ui_print "- Will attempt safe merge into audio_effects*.xml/conf at boot (no AML found)."
+if [ "$COPIED" -eq 0 ]; then
+  ui_print "! Could not locate any ViPER engine (libv4afx_r.so/libv4a_fx.so). Module will install but V4A won't load."
 fi
 
+# Stage config + defaults
 mkdir -p "$MODPATH/system/etc/defaults"
-cp -fp "$ZIPDIR/config/v4a_app_defaults.properties" "$MODPATH/system/etc/defaults/v4a_app_defaults.properties"
-set_perm "$MODPATH/system/etc/defaults/v4a_app_defaults.properties" 0644 root root
+cat > "$MODPATH/system/etc/defaults/v4a_app_defaults.properties" <<'EOF'
+legacy_mode=true
+attach_session0=true
+convolver_safe_mode=true
+EOF
+chmod 0644 "$MODPATH/system/etc/defaults/v4a_app_defaults.properties"
 
 ui_print "- Staging complete"

@@ -1,7 +1,7 @@
-id=v4a-a15-compat
-name=ViPER4Android A15 Compatibility Pack
+id=v4a-a15-compat-auto
+name=ViPER4Android A15 Compatibility Pack (Auto-Find Engine + Watchdog)
 version=1.1.0
-versionCode=110
-author=you
-description=Android 15 compatibility layer for ViPER4Android: correct soundfx paths (system_ext), strict SELinux rules, optional audio_effects merge, Legacy/Session-0 defaults, and watchdog auto-restart.
+versionCode=120
+author=Uxtrom
+description=Installs V4A engine for Android 15, auto-detects existing engine libs from installed V4A modules or system (libv4afx_r.so/libv4a_fx.so), includes watchdog auto-restart.
 minMagisk=26000

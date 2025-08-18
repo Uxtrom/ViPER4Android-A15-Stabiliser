@@ -1,2 +1,8 @@
 #!/sbin/sh
+ZIPFILE="$3"
+TMPDIR=/dev/tmp/v4a_a15_compat
+rm -rf "$TMPDIR"
+mkdir -p "$TMPDIR"
+unzip -o "$ZIPFILE" 'customize.sh' -d "$TMPDIR" >/dev/null 2>&1
+sh "$TMPDIR/customize.sh" "$@"
 exit 0

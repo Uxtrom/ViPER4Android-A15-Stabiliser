@@ -1,1 +1,3 @@
 allow audioserver system_file:file { read open getattr map };
+allow audioserver system_lib_file:file { read open getattr map };
+allow audioserver system_ext_file:file { read open getattr map };

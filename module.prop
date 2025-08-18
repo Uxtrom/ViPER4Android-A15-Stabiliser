@@ -1,7 +1,7 @@
 id=v4a-a15-compat
 name=ViPER4Android A15 Compatibility Pack
-version=1.0.0
-versionCode=100
+version=1.1.0
+versionCode=110
 author=you
-description=Stabilizes ViPER4Android on Android 15: correct soundfx path (system_ext), minimal SELinux, optional audio_effects merge, Legacy/Session-0 defaults. Install with or after ViPER4Android Repackaged.
+description=Android 15 compatibility layer for ViPER4Android: correct soundfx paths (system_ext), strict SELinux rules, optional audio_effects merge, Legacy/Session-0 defaults, and watchdog auto-restart.
 minMagisk=26000

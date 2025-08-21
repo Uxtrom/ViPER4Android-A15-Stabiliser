@@ -1,7 +1,7 @@
 id=v4a-a15-compat-auto
 name=ViPER4Android A15 Compatibility Pack (Auto-Find Engine + Watchdog)
-version=1.1.0
-versionCode=120
+version=1.2.0-fixed
+versionCode=121
 author=Uxtrom
-description=Installs V4A engine for Android 15, auto-detects existing engine libs from installed V4A modules or system (libv4afx_r.so/libv4a_fx.so), includes watchdog auto-restart.
+description=Fixes V4A auto-stop on route/source switches via event-driven watchdog, improved SELinux policies, and adds v4actl toggle command.
 minMagisk=26000

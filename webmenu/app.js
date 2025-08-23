@@ -1,0 +1,1 @@
+console.log('V4A 1.3.0 app.js');

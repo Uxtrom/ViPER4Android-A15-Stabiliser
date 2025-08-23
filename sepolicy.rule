@@ -1,8 +1,1 @@
 allow audioserver system_file:file { read open getattr map };
-allow audioserver system_lib_file:file { read open getattr map };
-allow audioserver system_ext_file:file { read open getattr map };
-allow audioserver vendor_file:file { read open getattr map };
-allow audioserver vendor_configs_file:dir { search read open getattr };
-allow audioserver vendor_configs_file:file { read open getattr map };
-allow audioserver product_file:file { read open getattr map };
-allow audioserver odm_file:file { read open getattr map };

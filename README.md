@@ -1,23 +1,3 @@
-You’re right — the last pass was too safe. Here’s a **proper, production-ready `README.md`** with badges, clear guardrails, hard truths about BT/offload, and a precise fix path for the “driver not initiated” case (Magisk OverlayFS / “Magisk Mount Extended” by HuskyDG). Drop this in your repo.
-
-````markdown
-# 🎵 ViPER4Android A13–A15 (KernelSU) — v1.4.0
-
-[![Version](https://img.shields.io/badge/release-v1.4.0-4c1)](#-changelog)
-[![Android](https://img.shields.io/badge/Android-13--15-blue)](#-requirements)
-[![Root](https://img.shields.io/badge/Root-KernelSU-informational)](#-requirements)
-[![UI](https://img.shields.io/badge/Control-Terminal%20%2B%20V4AControl-8a2be2)](#-usage)
-[![License](https://img.shields.io/badge/License-Respect%20upstream-lightgrey)](#-credits--license)
-
-This build provides **ViPER4Android** for modern Android (A13–A15) with **KernelSU**.  
-It **removes the legacy WebUI / `v4actl`** and replaces them with:
-- a **terminal menu**: `v4a-menu` (invoked as `su -c v4a`)
-- a **companion APK**: **V4AControl** from **WSTxda**.
-
-> Reality check: Effects on **Bluetooth/USB/offload** are ROM/device-dependent. If your audio path bypasses AudioFlinger (common with offload/DSP), **V4A will not process**. See [Limitations](#-known-limitations--reality-check).
-
----
-
 ## 📦 Install
 1. **Flash the ZIP in KernelSU Manager** (Modules → Install from storage).
 2. **Reboot**.
@@ -61,16 +41,16 @@ Menu actions:
 
 ### Companion App
 
-* **V4AControl (RE)** by WSTxda:
+* **V4A(RE)** by WSTxda:
   👉 [https://github.com/WSTxda/ViperFX-RE-Releases](https://github.com/WSTxda/ViperFX-RE-Releases)
 
 ---
 
 ## 🧩 Supported components
 
-* **Driver / App**: WSTxda’s **V4AControl (RE)**
+* **Driver / App**: WSTxda’s **V4A(RE)**
   👉 [https://github.com/WSTxda/ViperFX-RE-Releases](https://github.com/WSTxda/ViperFX-RE-Releases)
-* **Root frameworks**: KernelSU (primary). Magisk/APatch users can still use the **driver APK** from WSTxda.
+* **Root frameworks**: KernelSU (primary) and Magisk.
 
 ---
 
@@ -91,14 +71,6 @@ This usually means your **vendor audio\_effects XML** didn’t get overlaid earl
 * Re-flash this module (KernelSU Manager), reboot again.
 * Run:
 
-  ```bash
-  su -c v4a   # Heal → Status
-  ```
-* If still stuck: **clear V4AControl data**, reboot, **Heal** again.
-
-> If you’re mixing KernelSU and Magisk modules: KernelSU’s module system can conflict with Magisk’s magic mount. Keep your stack simple: **either** KernelSU modules + OverlayFS helper **or** pure Magisk with OverlayFS. Don’t half-enable both.
-
----
 
 ### 2) No effect on **Bluetooth / USB / Offload**
 
@@ -158,7 +130,7 @@ setprop persist.v4a.enabled 1   # or 0, then restart audioserver via v4a-menu
 
 ## 📚 References
 
-* **V4AControl (RE) releases** — app + driver info
+* **V4A(RE) releases** — app + driver info
   [https://github.com/WSTxda/ViperFX-RE-Releases](https://github.com/WSTxda/ViperFX-RE-Releases)
 * **OverlayFS helper** (Magisk OverlayFS / “Magisk Mount Extended” by HuskyDG, KSU-compatible mirror)
   Search: `Magisk-Modules-Alt-Repo/magisk_overlayfs`

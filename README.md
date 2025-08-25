@@ -39,11 +39,6 @@ Menu actions:
 * **Restart** `audioserver`
 * **Heal** (re-attach effect chain if the session slipped)
 
-### Companion App
-
-* **V4A(RE)** by WSTxda:
-  👉 [https://github.com/WSTxda/ViperFX-RE-Releases](https://github.com/WSTxda/ViperFX-RE-Releases)
-
 ---
 
 ## 🧩 Supported components

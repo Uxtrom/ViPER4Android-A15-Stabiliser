@@ -1,7 +1,7 @@
 id=v4a-a15-compat-auto
-name=ViPER4Android A15 Compatibility Pack (Auto-Find Engine + Watchdog)
-version=1.3.0
+name=ViPER4Android A15 Compat-CLI 
+version=1.4.0
 versionCode=130
 author=Uxtrom
-description=ViPER4Android with watchdog, webmenu toggle, re-init on re-enable, minimal SELinux, logging, KernelSU UI integration.
+description=KernelSU module for ViPER4Android with watchdog (A13–A15). WebUI/v4actl/APK removed. Use terminal `v4a` only.
 minMagisk=26000
